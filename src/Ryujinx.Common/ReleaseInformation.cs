@@ -37,9 +37,9 @@ namespace Ryujinx.Common
         public static string GetChangelogUrl(Version currentVersion, Version newVersion) =>
             IsCanaryBuild 
                 ? $"https://github.com/{ReleaseChannelOwner}/{ReleaseChannelSourceRepo}/compare/Canary-{currentVersion}...Canary-{newVersion}" 
-                : $"https://github.com/{ReleaseChannelOwner}/{ReleaseChannelSourceRepo}/releases/tag/{newVersion}";
+                : GetChangelogForVersion(newVersion);
         
         public static string GetChangelogForVersion(Version version) =>
-            $"https://github.com/{ReleaseChannelOwner}/{ReleaseChannelRepo}/releases/tag/{version}";
+            $"https://github.com/{ReleaseChannelOwner}/{ReleaseChannelRepo}/releases/{version}";
     }
 }

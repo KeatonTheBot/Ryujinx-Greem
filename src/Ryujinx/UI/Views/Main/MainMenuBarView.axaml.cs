@@ -6,13 +6,14 @@ using Gommon;
 using LibHac.Common;
 using LibHac.Ns;
 using Ryujinx.Ava.Common.Locale;
+using Ryujinx.Ava.UI.Controls;
 using Ryujinx.Ava.UI.Helpers;
 using Ryujinx.Ava.UI.ViewModels;
 using Ryujinx.Ava.UI.Windows;
 using Ryujinx.Ava.Utilities;
-using Ryujinx.Ava.Utilities.AppLibrary;
-using Ryujinx.Ava.Utilities.Compat;
-using Ryujinx.Ava.Utilities.Configuration;
+using Ryujinx.Ava.Systems.AppLibrary;
+using Ryujinx.Ava.Systems.Configuration;
+using Ryujinx.Ava.UI.Views.Dialog;
 using Ryujinx.Common;
 using Ryujinx.Common.Helper;
 using Ryujinx.Common.Utilities;
@@ -25,17 +26,13 @@ using System.Threading.Tasks;
 
 namespace Ryujinx.Ava.UI.Views.Main
 {
-    public partial class MainMenuBarView : UserControl
+    public partial class MainMenuBarView : RyujinxControl<MainWindowViewModel>
     {
         public MainWindow Window { get; private set; }
-        public MainWindowViewModel ViewModel { get; private set; }
 
         public MainMenuBarView()
         {
             InitializeComponent();
-
-            RyuLogo.IsVisible = !ConfigurationState.Instance.ShowTitleBar;
-            RyuLogo.Source = MainWindowViewModel.IconBitmap;
 
             ToggleFileTypesMenuItem.ItemsSource = GenerateToggleFileTypeItems();
             ChangeLanguageMenuItem.ItemsSource = GenerateLanguageMenuItems();
@@ -49,9 +46,9 @@ namespace Ryujinx.Ava.UI.Views.Main
             CheatManagerMenuItem.Command = Commands.CreateSilentFail(OpenCheatManagerForCurrentApp);
             InstallFileTypesMenuItem.Command = Commands.Create(InstallFileTypes);
             UninstallFileTypesMenuItem.Command = Commands.Create(UninstallFileTypes);
-            XciTrimmerMenuItem.Command = Commands.Create(XCITrimmerWindow.Show);
-            AboutWindowMenuItem.Command = Commands.Create(AboutWindow.Show);
-            CompatibilityListMenuItem.Command = Commands.Create(() => CompatibilityList.Show());
+            XciTrimmerMenuItem.Command = Commands.Create(XciTrimmerView.Show);
+            AboutWindowMenuItem.Command = Commands.Create(AboutView.Show);
+            CompatibilityListMenuItem.Command = Commands.Create(() => CompatibilityListWindow.Show());
 
             UpdateMenuItem.Command = MainWindowViewModel.UpdateCommand;
 
@@ -73,7 +70,7 @@ namespace Ryujinx.Ava.UI.Views.Main
                     {
                         Content = $".{it.FileName}",
                         IsChecked = it.FileType.GetConfigValue(ConfigurationState.Instance.UI.ShownFileTypes),
-                        Command = MiniCommand.Create(() => Window.ToggleFileType(it.FileName))
+                        Command = Commands.Create(() => Window.ToggleFileType(it.FileName))
                     }
                 );
 
@@ -108,7 +105,7 @@ namespace Ryujinx.Ava.UI.Views.Main
                     Margin = new Thickness(3, 0, 3, 0),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     Header = languageName,
-                    Command = MiniCommand.Create(() => MainWindowViewModel.ChangeLanguage(language))
+                    Command = Commands.Create(() => MainWindowViewModel.ChangeLanguage(language))
                 };
 
                 yield return menuItem;
@@ -226,7 +223,7 @@ namespace Ryujinx.Ava.UI.Views.Main
 
             // Correctly size window when 'TitleBar' is enabled (Nov. 14, 2024)
             double barsHeight = ((Window.StatusBarHeight + Window.MenuBarHeight) +
-                (ConfigurationState.Instance.ShowTitleBar ? (int)Window.TitleBar.Height : 0));
+                (ConfigurationState.Instance.ShowOldUI ? (int)Window.TitleBar.Height : 0));
 
             double windowWidthScaled = (resolutionWidth * Program.WindowScaleFactor);
             double windowHeightScaled = ((resolutionHeight + barsHeight) * Program.WindowScaleFactor);

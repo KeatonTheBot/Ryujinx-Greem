@@ -1,11 +1,12 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Ryujinx.Ava.Common.Locale;
+using Ryujinx.Ava.UI.Controls;
+using Ryujinx.Ava.UI.ViewModels;
 using Ryujinx.Ava.UI.Windows;
-using Ryujinx.Ava.Utilities.Configuration;
+using Ryujinx.Ava.Systems.Configuration;
 using Ryujinx.Common;
 using Ryujinx.Common.Configuration;
 using Ryujinx.Common.Logging;
@@ -13,7 +14,7 @@ using System;
 
 namespace Ryujinx.Ava.UI.Views.Main
 {
-    public partial class MainStatusBarView : UserControl
+    public partial class MainStatusBarView : RyujinxControl<MainWindowViewModel>
     {
         public MainWindow Window;
 
@@ -29,7 +30,7 @@ namespace Ryujinx.Ava.UI.Views.Main
             if (VisualRoot is MainWindow window)
             {
                 Window = window;
-                DataContext = window.ViewModel;
+                ViewModel = window.ViewModel;
                 LocaleManager.Instance.LocaleChanged += () => Dispatcher.UIThread.Post(() =>
                 {
                     if (Window.ViewModel.EnableNonGameRunningControls)
